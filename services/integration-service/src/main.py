@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from src.api.v1.endpoints import jira, github, slack
 import time
 
 app = FastAPI(
@@ -16,6 +17,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register Routers
+app.include_router(jira.router, prefix="/api/v1/jira", tags=["jira"])
+app.include_router(github.router, prefix="/api/v1/github", tags=["github"])
+app.include_router(slack.router, prefix="/api/v1/slack", tags=["slack"])
 
 @app.get("/health")
 async def health_check():
