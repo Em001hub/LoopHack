@@ -1,75 +1,33 @@
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
-require('dotenv').config();
+const { PORT } = require('./config/config');
+const corsMiddleware = require('./middleware/cors');
+const loggerMiddleware = require('./middleware/logger');
+const rateLimiterMiddleware = require('./middleware/rateLimiter');
+const errorHandler = require('./middleware/errorHandler');
+const routes = require('./routes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Security Middleware
 app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
+app.use(corsMiddleware);
+
+// Request Logging
+app.use(loggerMiddleware);
+
+// Rate Limiting
+app.use(rateLimiterMiddleware);
+
+// Body Parsing
 app.use(express.json());
 
-// Service Endpoints Configuration
-const services = {
-    integration: process.env.INTEGRATION_SERVICE_URL || 'http://localhost:8000',
-    core: process.env.CORE_SERVICE_URL || 'http://localhost:3001',
-    intelligence: process.env.INTELLIGENCE_SERVICE_URL || 'http://localhost:8001',
-    realtime: process.env.REALTIME_SERVICE_URL || 'http://localhost:3002',
-};
+// Main Routes
+app.use('/api', routes);
 
-// Health Check
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'UP',
-        service: 'api-gateway',
-        timestamp: new Date().toISOString(),
-    });
-});
+// Global Error Handler
+app.use(errorHandler);
 
-// Proxy Routes
-// Integration Service
-app.use('/api/integrations', createProxyMiddleware({
-    target: services.integration,
-    changeOrigin: true,
-    pathRewrite: {
-        '^/api/integrations': '/api/v1',
-    },
-}));
-
-// Core Logic Service
-app.use('/api/core', createProxyMiddleware({
-    target: services.core,
-    changeOrigin: true,
-    pathRewrite: {
-        '^/api/core': '/api/v1',
-    },
-}));
-
-// Intelligence Service
-app.use('/api/intelligence', createProxyMiddleware({
-    target: services.intelligence,
-    changeOrigin: true,
-    pathRewrite: {
-        '^/api/intelligence': '/api/v1',
-    },
-}));
-
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: err.message,
-    });
-});
-
-// Start Server
 app.listen(PORT, () => {
-    console.log(`🚀 API Gateway running on port ${PORT}`);
-    console.log(`🔗 Proxying /api/integrations -> ${services.integration}`);
+    console.log(`API Gateway running on port ${PORT}`);
 });
