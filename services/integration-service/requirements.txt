@@ -3,6 +3,8 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 httpx
+pytest
+pytest-asyncio
 pydantic
 pydantic-settings
 python-dotenv

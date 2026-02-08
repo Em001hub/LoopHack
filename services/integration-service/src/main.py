@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.v1.endpoints import jira, github, slack, calendar
+from src.api.v1.endpoints import jira, github, slack, calendar, sync
 from src.config.database import engine, Base
 import time
 
@@ -27,6 +27,7 @@ app.include_router(jira.router, prefix="/api/v1/jira", tags=["jira"])
 app.include_router(github.router, prefix="/api/v1/github", tags=["github"])
 app.include_router(slack.router, prefix="/api/v1/slack", tags=["slack"])
 app.include_router(calendar.router, prefix="/api/v1/calendar", tags=["calendar"])
+app.include_router(sync.router, prefix="/api/v1/sync", tags=["sync"])
 
 @app.get("/health")
 async def health_check():

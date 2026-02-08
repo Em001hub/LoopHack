@@ -44,5 +44,70 @@ async def get_jira_tasks(project_key: str):
 
 @router.post("/sync")
 async def sync_jira(background_tasks: BackgroundTasks):
-    # This would trigger a full background sync
-    return {"message": "Sync triggered"}
+    """Trigger a full Jira sync in the background."""
+    if not all([JIRA_DOMAIN, JIRA_EMAIL, JIRA_API_TOKEN]):
+        raise HTTPException(status_code=400, detail="Jira credentials not configured")
+    
+    from src.config.database import SessionLocal
+    from src.services.sync_service import SyncService
+    
+    def run_sync():
+        db = SessionLocal()
+        try:
+            sync_service = SyncService(db)
+            import asyncio
+            asyncio.run(sync_service.sync_jira())
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise e
+        finally:
+            db.close()
+    
+    background_tasks.add_task(run_sync)
+    return {"message": "Jira sync triggered", "status": "processing"}
+
+
+@router.post("/webhook")
+async def jira_webhook(request: Dict[str, Any]):
+    """
+    Handle Jira webhook events.
+    
+    Jira sends webhooks for various events like:
+    - issue_created
+    - issue_updated
+    - issue_deleted
+    - sprint_started
+    - etc.
+    """
+    # In production, validate webhook signature here
+    # from src.integrations.jira.webhook_validator import validate_jira_signature
+    # signature = request.headers.get("X-Jira-Signature")
+    # if not validate_jira_signature(await request.body(), signature, WEBHOOK_SECRET):
+    #     raise HTTPException(status_code=401, detail="Invalid webhook signature")
+    
+    webhook_event = request.get("webhookEvent")
+    
+    if not webhook_event:
+        raise HTTPException(status_code=400, detail="Missing webhookEvent")
+    
+    # Process different event types
+    if webhook_event == "jira:issue_created":
+        issue = request.get("issue", {})
+        # Process new issue
+        return {"message": "Issue created event processed", "issue_key": issue.get("key")}
+    
+    elif webhook_event == "jira:issue_updated":
+        issue = request.get("issue", {})
+        # Process updated issue
+        return {"message": "Issue updated event processed", "issue_key": issue.get("key")}
+    
+    elif webhook_event == "jira:issue_deleted":
+        issue = request.get("issue", {})
+        # Process deleted issue
+        return {"message": "Issue deleted event processed", "issue_key": issue.get("key")}
+    
+    else:
+        # Log unhandled event type
+        return {"message": f"Webhook event received: {webhook_event}", "status": "acknowledged"}
+
