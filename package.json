@@ -1,0 +1,18 @@
+{
+  "name": "loophack-root",
+  "version": "1.0.0",
+  "description": "LoopHack Project Root",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "frontend",
+    "shared"
+  ],
+  "scripts": {
+    "start": "docker-compose up",
+    "build": "echo 'Run build in specific workspaces'",
+    "test": "echo 'Run test in specific workspaces'"
+  },
+  "author": "",
+  "license": "ISC"
+}

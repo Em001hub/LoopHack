@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Service - API Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .result-item strong {
+            color: #333;
+        }
+
+        .risk-factor {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .confidence-interval {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .confidence-item {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            background: white;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Intelligence Service</h1>
+            <p class="subtitle">AI/ML Engine for Project Intelligence</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('prediction')">Timeline Prediction</button>
+            <button class="tab" onclick="switchTab('sentiment')">Sentiment Analysis</button>
+            <button class="tab" onclick="switchTab('health')">Service Health</button>
+        </div>
+
+        <!-- Timeline Prediction Tab -->
+        <div id="prediction" class="tab-content active">
+            <div class="card">
+                <h2>📊 Timeline Prediction</h2>
+                <div class="input-group">
+                    <label for="projectId">Project ID</label>
+                    <input type="text" id="projectId" value="demo_project_123" placeholder="Enter project ID">
+                </div>
+                <div class="input-group">
+                    <label for="targetDate">Target Date (Optional)</label>
+                    <input type="date" id="targetDate">
+                </div>
+                <button onclick="predictTimeline()">🔮 Predict Timeline</button>
+
+                <div class="loading" id="predictionLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing project data...</p>
+                </div>
+
+                <div class="result" id="predictionResult">
+                    <h3>Prediction Results</h3>
+                    <div id="predictionContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sentiment Analysis Tab -->
+        <div id="sentiment" class="tab-content">
+            <div class="card">
+                <h2>😊 Sentiment Analysis</h2>
+                <div class="input-group">
+                    <label for="sentimentText">Text to Analyze</label>
+                    <textarea id="sentimentText" rows="4"
+                        placeholder="Enter text to analyze sentiment...">The team is doing great work and we're making excellent progress on the project!</textarea>
+                </div>
+                <button onclick="analyzeSentiment()">🔍 Analyze Sentiment</button>
+
+                <div class="loading" id="sentimentLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing sentiment...</p>
+                </div>
+
+                <div class="result" id="sentimentResult">
+                    <h3>Sentiment Analysis Results</h3>
+                    <div id="sentimentContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Check Tab -->
+        <div id="health" class="tab-content">
+            <div class="card">
+                <h2>🏥 Service Health</h2>
+                <button onclick="checkHealth()">🔄 Check Health Status</button>
+
+                <div class="loading" id="healthLoading">
+                    <div class="spinner"></div>
+                    <p>Checking service health...</p>
+                </div>
+
+                <div class="result" id="healthResult">
+                    <h3>Health Status</h3>
+                    <div id="healthContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4002';
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function predictTimeline() {
+            const projectId = document.getElementById('projectId').value;
+            const targetDate = document.getElementById('targetDate').value;
+
+            const loading = document.getElementById('predictionLoading');
+            const result = document.getElementById('predictionResult');
+            const content = document.getElementById('predictionContent');
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const requestBody = {
+                    project_id: projectId
+                };
+
+                if (targetDate) {
+                    requestBody.target_date = new Date(targetDate).toISOString();
+                }
+
+                const response = await fetch(`${API_BASE}/api/v1/predict-timeline`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                const completionDate = new Date(data.predicted_completion_date).toLocaleDateString();
+                const weeksRemaining = data.predicted_weeks_remaining.toFixed(1);
+
+                content.innerHTML = `
+                    <div class="result-item">
+                        <strong>📅 Predicted Completion:</strong> ${completionDate}
+                    </div>
+                    <div class="result-item">
+                        <strong>⏱️ Weeks Remaining:</strong> ${weeksRemaining} weeks
+                    </div>
+                    <div class="result-item">
+                        <strong>🎯 Model Confidence:</strong> ${(data.model_confidence * 100).toFixed(0)}%
+                    </div>
+                    ${data.probability_on_time ? `
+                    <div class="result-item">
+                        <strong>✅ Probability On Time:</strong> ${(data.probability_on_time * 100).toFixed(0)}%
+                    </div>
+                    ` : ''}
+                    <div class="result-item">
+                        <strong>📊 Confidence Intervals:</strong>
+                        <div class="confidence-interval">
+                            <div class="confidence-item">
+                                <div>P10 (Optimistic)</div>
+                                <strong>${new Date(data.confidence_intervals.p10).toLocaleDateString()}</strong>
+                            </div>
+                            <div class="confidence-item">
+                                <div>P50 (Most Likely)</div>
+                                <strong>${new Date(data.confidence_intervals.p50).toLocaleDateString()}</strong>
+                            </div>
+                            <div class="confidence-item">
+                                <div>P90 (Pessimistic)</div>
+                                <strong>${new Date(data.confidence_intervals.p90).toLocaleDateString()}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    ${data.risk_factors.length > 0 ? `
+                    <div class="result-item">
+                        <strong>⚠️ Risk Factors:</strong>
+                        ${data.risk_factors.map(risk => `<div class="risk-factor">${risk}</div>`).join('')}
+                    </div>
+                    ` : ''}
+                    ${data.note ? `<div class="result-item"><em>${data.note}</em></div>` : ''}
+                `;
+
+                result.classList.add('show');
+            } catch (error) {
+                content.innerHTML = `<div class="result-item" style="color: red;">❌ Error: ${error.message}</div>`;
+                result.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        async function analyzeSentiment() {
+            const text = document.getElementById('sentimentText').value;
+
+            const loading = document.getElementById('sentimentLoading');
+            const result = document.getElementById('sentimentResult');
+            const content = document.getElementById('sentimentContent');
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/analyze-sentiment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        context: 'general'
+                    })
+                });
+
+                const data = await response.json();
+
+                const sentimentEmoji = {
+                    'positive': '😊',
+                    'negative': '😞',
+                    'neutral': '😐'
+                };
+
+                content.innerHTML = `
+                    <div class="result-item">
+                        <strong>Overall Sentiment:</strong> ${sentimentEmoji[data.sentiment]} ${data.sentiment.toUpperCase()}
+                    </div>
+                    <div class="result-item">
+                        <strong>Score:</strong> ${data.score.toFixed(2)} (range: -1 to 1)
+                    </div>
+                    <div class="result-item">
+                        <strong>Confidence:</strong> ${(data.confidence * 100).toFixed(0)}%
+                    </div>
+                    <div class="result-item">
+                        <strong>Emotion Breakdown:</strong>
+                        ${Object.entries(data.emotions).map(([emotion, score]) => `
+                            <div style="margin: 5px 0;">
+                                ${emotion}: <strong>${(score * 100).toFixed(0)}%</strong>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden;">
+                                    <div style="background: #667eea; height: 100%; width: ${score * 100}%;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                result.classList.add('show');
+            } catch (error) {
+                content.innerHTML = `<div class="result-item" style="color: red;">❌ Error: ${error.message}</div>`;
+                result.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        async function checkHealth() {
+            const loading = document.getElementById('healthLoading');
+            const result = document.getElementById('healthResult');
+            const content = document.getElementById('healthContent');
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/health-detailed`);
+                const data = await response.json();
+
+                const statusClass = data.status === 'healthy' ? 'status-healthy' : 'status-warning';
+
+                content.innerHTML = `
+                    <div class="result-item">
+                        <strong>Status:</strong> <span class="status-badge ${statusClass}">${data.status.toUpperCase()}</span>
+                    </div>
+                    <div class="result-item">
+                        <strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}
+                    </div>
+                    <div class="result-item">
+                        <strong>Components:</strong>
+                        ${Object.entries(data.components).map(([name, info]) => `
+                            <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                                <strong>${name}:</strong> ${info.status}
+                                ${info.response_time_ms ? `<br>Response Time: ${info.response_time_ms}ms` : ''}
+                                ${info.latency_ms ? `<br>Latency: ${info.latency_ms}ms` : ''}
+                                ${info.models ? `<br>Models: ${info.models.join(', ')}` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="result-item">
+                        <strong>Metrics:</strong>
+                        <div style="margin-top: 10px;">
+                            ${Object.entries(data.metrics).map(([key, value]) => `
+                                <div>${key}: <strong>${value}</strong></div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                result.classList.add('show');
+            } catch (error) {
+                content.innerHTML = `<div class="result-item" style="color: red;">❌ Error: ${error.message}<br><br>Make sure the service is running on port 4002</div>`;
+                result.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // Auto-check health on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkHealth, 500);
+        });
+    </script>
+</body>
+
+</html>
