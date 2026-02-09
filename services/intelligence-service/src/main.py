@@ -12,6 +12,7 @@ import sys
 
 from src.config.settings import settings
 from src.api.v1.endpoints import predictions, skills, simulations, sentiment, health, insights
+from src.api import conversation_routes
 from src.ml.models.timeline_predictor import TimelinePredictor
 
 # Configure logging
@@ -112,6 +113,8 @@ app.include_router(simulations.router, prefix="/api/v1", tags=["Simulations"])
 app.include_router(sentiment.router, prefix="/api/v1", tags=["Sentiment"])
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
 app.include_router(insights.router, prefix="/api/v1", tags=["Insights"])
+app.include_router(conversation_routes.router, prefix="/api/v1", tags=["Conversation Intelligence"])
+
 
 # Global exception handler
 @app.exception_handler(Exception)
