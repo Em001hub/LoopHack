@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: projectmind-postgres
+    environment:
+      POSTGRES_DB: projectmind
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - projectmind-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d projectmind"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: projectmind-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - projectmind-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Intelligence Service
+  intelligence-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: intelligence-service
+    environment:
+      # Service Configuration
+      SERVICE_NAME: intelligence-service
+      SERVICE_PORT: 4002
+      LOG_LEVEL: INFO
+      
+      # Database
+      DATABASE_URL: postgresql://admin:password@postgres:5432/projectmind
+      
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      
+      # OpenAI (optional)
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: gpt-4-turbo-preview
+      
+      # ML Configuration
+      ML_MODEL_PATH: /app/src/data/models
+      ENABLE_GPU: "false"
+      BATCH_SIZE: 32
+      
+      # Feature Flags
+      ENABLE_SKILL_EXTRACTION: "true"
+      ENABLE_TIMELINE_PREDICTION: "true"
+      ENABLE_SENTIMENT_ANALYSIS: "true"
+      ENABLE_CONVERSATION_INTELLIGENCE: "true"
+      
+      # Performance
+      MAX_WORKERS: 4
+      PREDICTION_CACHE_TTL: 3600
+    ports:
+      - "4002:4002"
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - model_data:/app/src/data/models
+    networks:
+      - projectmind-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Frontend (optional - for testing)
+  frontend:
+    image: nginx:alpine
+    container_name: projectmind-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend-integration:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - projectmind-network
+    depends_on:
+      - intelligence-service
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  model_data:
+    driver: local
+
+networks:
+  projectmind-network:
+    driver: bridge
+
+# Healthcheck status can be checked with:
+# docker-compose ps
+# docker inspect --format='{{json .State.Health}}' <container_name>
