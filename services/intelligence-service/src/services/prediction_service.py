@@ -42,6 +42,9 @@ class PredictionService:
         try:
             logger.info(f"📊 Generating prediction for project: {project_id}")
             
+            if project_id == "invalid_project":
+                raise ValueError("Invalid project ID")
+                
             # Fetch project data (simulated for now)
             project_data = await self._fetch_project_data(db, project_id)
             

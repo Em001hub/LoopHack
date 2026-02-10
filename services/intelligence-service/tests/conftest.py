@@ -22,3 +22,11 @@ def sample_project_data():
         'avg_task_age_days': 7,
         'team_experience_score': 0.75
     }
+@pytest.fixture
+async def client():
+    """Create test client"""
+    from httpx import AsyncClient
+    from src.main import app
+    
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac

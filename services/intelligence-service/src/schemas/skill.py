@@ -2,7 +2,7 @@
 Pydantic schemas for skill extraction endpoints
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Dict, Optional
 
 
@@ -11,13 +11,14 @@ class SkillExtractionRequest(BaseModel):
     user_id: str = Field(..., description="User ID to analyze")
     days: Optional[int] = Field(90, description="Days of history to analyze")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "user_sarah",
                 "days": 90
             }
         }
+    )
 
 
 class TechnicalSkill(BaseModel):
@@ -44,8 +45,8 @@ class SkillProfileResponse(BaseModel):
     confidence: float
     last_updated: str
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "user_sarah",
                 "technical_skills": [
@@ -68,6 +69,7 @@ class SkillProfileResponse(BaseModel):
                 "last_updated": "2024-02-09T10:00:00Z"
             }
         }
+    )
 
 
 class TaskMatchRequest(BaseModel):
@@ -76,8 +78,8 @@ class TaskMatchRequest(BaseModel):
     task_id: str
     task_requirements: Dict = Field(..., description="Required and preferred skills")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "user_sarah",
                 "task_id": "PROJ-123",
@@ -87,6 +89,7 @@ class TaskMatchRequest(BaseModel):
                 }
             }
         }
+    )
 
 
 class TaskMatchResponse(BaseModel):

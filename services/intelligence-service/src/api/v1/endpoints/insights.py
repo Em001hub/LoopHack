@@ -11,6 +11,130 @@ from loguru import logger
 router = APIRouter()
 
 
+@router.get("/daily-insights/{project_id}")
+async def get_daily_insights(project_id: str):
+    """Generate comprehensive daily insights for a project"""
+    try:
+        logger.info(f"💡 Generating daily insights for: {project_id}")
+        
+        insights_data = {
+            "project_id": project_id,
+            "date": "2026-02-09",
+            "summary": "Project Alpha made good progress today with 3 tasks completed and 3 PRs merged. Team morale remains healthy.",
+            "highlights": [
+                "✅ 3 tasks completed",
+                "✅ 3 PRs merged",
+                "✅ Zero critical blockers"
+            ],
+            "risks": [
+                {
+                    "type": "blocker",
+                    "severity": "medium",
+                    "description": "API integration pending external team",
+                    "impact": "May delay sprint by 2-3 days"
+                },
+                {
+                    "type": "resource",
+                    "severity": "low",
+                    "description": "Developer showing early burnout signs",
+                    "impact": "Monitor workload and schedule 1:1"
+                }
+            ],
+            "opportunities": [
+                "Mike has availability for next 2 sprints - consider assigning high-priority features",
+                "New automation tool could reduce testing time by 40%",
+                "Client feedback positive - good time to propose scope expansion"
+            ],
+            "predictions": {
+                "sprint_completion": "85% likely on time",
+                "next_milestone": "92% confidence by March 15",
+                "team_velocity": "Expected to increase 10% next sprint"
+            },
+            "metrics": {
+                "velocity": 23.5,
+                "team_morale": 0.72,
+                "code_quality": 0.88,
+                "timeline_confidence": 0.65
+            },
+            "generated_at": "2026-02-09T17:53:52.123456"
+        }
+        
+        logger.success(f"✅ Generated insights with {len(insights_data['highlights'])} highlights")
+        return insights_data
+        
+    except Exception as e:
+        logger.error(f"❌ Error generating insights: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate daily insights")
+
+
+@router.get("/project-health/{project_id}")
+async def get_project_health(project_id: str):
+    """Get overall project health score and metrics"""
+    try:
+        logger.info(f"💚 Checking health for: {project_id}")
+        
+        health_data = {
+            "project_id": project_id,
+            "overall_score": 78,
+            "health_level": "Good",
+            "components": {
+                "timeline": {"score": 75, "status": "on_track"},
+                "team_morale": {"score": 82, "status": "healthy"},
+                "code_quality": {"score": 88, "status": "excellent"},
+                "velocity": {"score": 70, "status": "moderate"}
+            },
+            "alerts": ["1 developer showing early burnout signs"],
+            "recommendations": [
+                "Schedule 1:1 with at-risk team member",
+                "Consider adding sprint buffer"
+            ],
+            "last_updated": "2026-02-09T18:13:33.123456"
+        }
+        
+        return health_data
+        
+    except Exception as e:
+        logger.error(f"❌ Error checking project health: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get project health")
+
+
+@router.get("/recommendations/{task_id}")
+async def get_task_recommendations(task_id: str):
+    """Get AI recommendations for a specific task"""
+    try:
+        logger.info(f"🎯 Getting recommendations for: {task_id}")
+        
+        recommendations = {
+            "task_id": task_id,
+            "assignment": {
+                "recommended_assignee": "user_sarah",
+                "match_score": 0.92,
+                "reasoning": "Strong Python and FastAPI skills, 95% match"
+            },
+            "complexity": {
+                "level": "medium",
+                "estimated_hours": 8,
+                "confidence": 0.85
+            },
+            "dependencies": ["task_042", "task_067"],
+            "risks": [
+                "Requires API keys from external team",
+                "May need additional backend support"
+            ],
+            "suggestions": [
+                "Pair with senior dev for first day",
+                "Schedule mid-task check-in",
+                "Allocate 20% buffer for unknowns"
+            ]
+        }
+        
+        return recommendations
+        
+    except Exception as e:
+        logger.error(f"❌ Error generating recommendations: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate recommendations")
+
+
 class InsightResponse(BaseModel):
     """Project insight"""
     type: str

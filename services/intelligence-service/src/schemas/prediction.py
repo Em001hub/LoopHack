@@ -2,7 +2,7 @@
 Pydantic schemas for prediction endpoints
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict
 from datetime import datetime
 
@@ -12,13 +12,14 @@ class TimelinePredictionRequest(BaseModel):
     project_id: str = Field(..., description="Unique project identifier")
     target_date: Optional[datetime] = Field(None, description="Target completion date")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "project_id": "proj_123",
                 "target_date": "2024-12-31T00:00:00Z"
             }
         }
+    )
 
 
 class ConfidenceIntervals(BaseModel):
@@ -40,8 +41,8 @@ class TimelinePredictionResponse(BaseModel):
     note: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.now)
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "project_id": "proj_123",
                 "predicted_completion_date": "2024-11-15T00:00:00Z",
@@ -57,6 +58,7 @@ class TimelinePredictionResponse(BaseModel):
                 "created_at": "2024-09-20T10:30:00Z"
             }
         }
+    )
 
 
 class PredictionHistory(BaseModel):
@@ -68,5 +70,4 @@ class PredictionHistory(BaseModel):
     accuracy: Optional[float] = None
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -2,7 +2,7 @@
 Pydantic schemas for sentiment analysis endpoints
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Dict, Optional
 
 
@@ -11,13 +11,14 @@ class SentimentAnalysisRequest(BaseModel):
     user_id: str
     days: Optional[int] = Field(30, ge=7, le=90)
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "user_sarah",
                 "days": 30
             }
         }
+    )
 
 
 class SentimentTrendResponse(BaseModel):

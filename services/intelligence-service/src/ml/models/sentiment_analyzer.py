@@ -13,9 +13,9 @@ try:
     from transformers import pipeline
     import torch
     TRANSFORMERS_AVAILABLE = True
-except ImportError:
+except Exception as e:
     TRANSFORMERS_AVAILABLE = False
-    logger.warning("Transformers not available, using fallback sentiment analysis")
+    logger.warning(f"ML libraries (transformers/torch) not available: {e}. Using fallback sentiment analysis.")
 
 
 class SentimentAnalyzer:

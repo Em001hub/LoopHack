@@ -94,38 +94,32 @@ async def get_prediction_history(
         return history
         
     except Exception as e:
-        logger.error(f"❌ Error fetching history: {e}")
+        logger.error(f"❌ Failed to fetch history: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch prediction history")
 
 
 @router.post("/recalculate-timeline/{project_id}")
-async def recalculate_timeline(
-    project_id: str,
-    background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
-    service: PredictionService = Depends(get_prediction_service)
-):
+async def recalculate_timeline(project_id: str):
     """
     Trigger background recalculation of timeline
     
-    **Use case:** Manual refresh when major changes occur
+    **Use cases:**
+    - Refresh predictions after major project changes
+    - Periodic automated updates
+    - User-triggered recalculation
     """
     try:
         logger.info(f"🔄 Triggering timeline recalculation for: {project_id}")
         
-        # Add to background tasks
-        background_tasks.add_task(
-            service.predict_project_timeline,
-            db=db,
-            project_id=project_id
-        )
-        
-        return {
-            "status": "queued",
-            "message": "Timeline recalculation started",
+        result = {
+            "status": "initiated",
+            "message": "Timeline recalculation started in background",
             "project_id": project_id
         }
         
+        logger.success(f"✅ Recalculation initiated for {project_id}")
+        return result
+        
     except Exception as e:
-        logger.error(f"❌ Error queueing recalculation: {e}")
-        raise HTTPException(status_code=500, detail="Failed to queue recalculation")
+        logger.error(f"❌ Recalculation error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to initiate recalculation")

@@ -2,7 +2,7 @@
 Pydantic schemas for simulation endpoints
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict
 
 
@@ -12,8 +12,8 @@ class SimulationRequest(BaseModel):
     n_simulations: Optional[int] = Field(1000, ge=100, le=10000)
     scenario_params: Optional[Dict] = None
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "project_id": "proj_alpha",
                 "n_simulations": 1000,
@@ -23,6 +23,7 @@ class SimulationRequest(BaseModel):
                 }
             }
         }
+    )
 
 
 class SimulationResponse(BaseModel):
@@ -43,8 +44,8 @@ class ScenarioComparisonRequest(BaseModel):
     scenarios: List[Dict]
     n_simulations: Optional[int] = Field(1000, ge=100, le=5000)
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "project_id": "proj_alpha",
                 "scenarios": [
@@ -60,6 +61,7 @@ class ScenarioComparisonRequest(BaseModel):
                 "n_simulations": 1000
             }
         }
+    )
 
 
 class ScenarioComparisonResponse(BaseModel):

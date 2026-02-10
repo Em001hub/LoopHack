@@ -14,9 +14,9 @@ import re
 try:
     import spacy
     SPACY_AVAILABLE = True
-except ImportError:
+except Exception as e:
     SPACY_AVAILABLE = False
-    logger.warning("spaCy not available, using fallback skill extraction")
+    logger.warning(f"spaCy not available: {e}. Using fallback skill extraction.")
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
