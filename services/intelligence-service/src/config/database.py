@@ -10,7 +10,10 @@ from loguru import logger
 from src.config.settings import settings
 
 # Convert postgres:// to postgresql+asyncpg://
-database_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+if settings.DATABASE_URL.startswith("postgresql://"):
+    database_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+else:
+    database_url = settings.DATABASE_URL
 
 # Create async engine
 engine = create_async_engine(

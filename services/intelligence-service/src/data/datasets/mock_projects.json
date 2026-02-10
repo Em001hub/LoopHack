@@ -1,0 +1,67 @@
+[
+    {
+        "project_id": "proj_001",
+        "project_name": "E-commerce Platform",
+        "remaining_story_points": 120,
+        "avg_weekly_velocity": 18.5,
+        "velocity_std": 3.2,
+        "team_size": 6,
+        "blocked_tasks_count": 2,
+        "high_complexity_count": 5,
+        "avg_task_age_days": 8.5,
+        "team_experience_score": 0.75,
+        "actual_weeks_taken": 7.2
+    },
+    {
+        "project_id": "proj_002",
+        "project_name": "Mobile App Redesign",
+        "remaining_story_points": 85,
+        "avg_weekly_velocity": 22.0,
+        "velocity_std": 4.1,
+        "team_size": 5,
+        "blocked_tasks_count": 1,
+        "high_complexity_count": 3,
+        "avg_task_age_days": 5.2,
+        "team_experience_score": 0.82,
+        "actual_weeks_taken": 4.5
+    },
+    {
+        "project_id": "proj_003",
+        "project_name": "API Gateway Migration",
+        "remaining_story_points": 200,
+        "avg_weekly_velocity": 15.0,
+        "velocity_std": 5.5,
+        "team_size": 8,
+        "blocked_tasks_count": 6,
+        "high_complexity_count": 12,
+        "avg_task_age_days": 15.0,
+        "team_experience_score": 0.65,
+        "actual_weeks_taken": 15.8
+    },
+    {
+        "project_id": "proj_004",
+        "project_name": "Dashboard Analytics",
+        "remaining_story_points": 60,
+        "avg_weekly_velocity": 25.0,
+        "velocity_std": 2.8,
+        "team_size": 4,
+        "blocked_tasks_count": 0,
+        "high_complexity_count": 2,
+        "avg_task_age_days": 3.5,
+        "team_experience_score": 0.88,
+        "actual_weeks_taken": 2.8
+    },
+    {
+        "project_id": "proj_005",
+        "project_name": "Payment Integration",
+        "remaining_story_points": 150,
+        "avg_weekly_velocity": 12.5,
+        "velocity_std": 6.0,
+        "team_size": 7,
+        "blocked_tasks_count": 8,
+        "high_complexity_count": 10,
+        "avg_task_age_days": 20.0,
+        "team_experience_score": 0.55,
+        "actual_weeks_taken": 14.5
+    }
+]
