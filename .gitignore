@@ -9,10 +9,17 @@ __pycache__/
 
 # Testing
 coverage/
+htmlcov/
+.coverage
+*.coverage
 
 # Production
 build/
 dist/
+
+# Development
+demo.html
+
 
 # Misc
 .DS_Store
